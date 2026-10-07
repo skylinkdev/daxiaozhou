@@ -36,7 +36,7 @@
 
     .card {
       position: relative;
-      width: min(100%, 480px);
+      width: min(100%, 760px);
       overflow: hidden;
       padding: 38px 38px 30px;
       border: 1px solid rgba(226, 225, 216, .8);
@@ -90,35 +90,76 @@
       font-size: 15px;
     }
 
-    .week-dates {
+    .month-heading {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-top: 34px;
-      padding: 17px 18px;
-      border-radius: 14px;
-      background: #f7f6f1;
-      font-size: 15px;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 30px;
+    }
+
+    .month-heading h2 {
+      margin: 0;
+      font-size: 20px;
       font-weight: 600;
+      letter-spacing: -.03em;
     }
 
-    .week-dates .icon {
-      display: grid;
-      width: 34px;
-      height: 34px;
-      flex: 0 0 auto;
-      place-items: center;
-      border-radius: 10px;
-      background: var(--green-soft);
-      color: var(--green);
-    }
-
-    .week-dates small {
-      display: block;
-      margin-top: 3px;
+    .month-heading p {
+      margin: 6px 0 0;
       color: var(--muted);
       font-size: 12px;
-      font-weight: 400;
+    }
+
+    .month-heading .legend { display: flex; gap: 12px; color: var(--muted); font-size: 11px; }
+    .legend span { display: inline-flex; align-items: center; gap: 5px; }
+    .legend i { width: 7px; height: 7px; border-radius: 50%; background: #789073; }
+    .legend .small-dot { background: #d5a477; }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 7px;
+      margin-top: 20px;
+    }
+
+    .weekday {
+      padding: 0 0 7px;
+      color: #a0a197;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .day {
+      position: relative;
+      display: grid;
+      min-height: 62px;
+      align-content: center;
+      justify-items: center;
+      gap: 5px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      background: #f7f6f1;
+      color: #777a70;
+      font-size: 13px;
+    }
+
+    .day.empty { background: transparent; }
+    .day .day-number { color: var(--ink); font-size: 14px; font-weight: 600; }
+    .day .day-type { font-size: 10px; }
+    .day.rest { background: var(--green-soft); }
+    .day.rest .day-type { color: var(--green); }
+    .day.today { border-color: #748b6e; box-shadow: inset 0 0 0 1px #748b6e; }
+    .day.today::after {
+      position: absolute;
+      top: 5px;
+      right: 6px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #748b6e;
+      content: "";
     }
 
     .divider { height: 1px; margin: 27px 0 22px; background: var(--line); }
@@ -180,12 +221,14 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    @media (max-width: 420px) {
-      .card { padding: 32px 25px 25px; border-radius: 20px; }
-      .card::before { left: 25px; }
-      .week-dates { padding: 15px; }
-      .calculation { gap: 7px; }
-      .point strong { font-size: 13px; }
+    @media (max-width: 560px) {
+      .card { padding: 32px 22px 25px; border-radius: 20px; }
+      .card::before { left: 22px; }
+      .calendar { gap: 5px; }
+      .day { min-height: 52px; border-radius: 9px; }
+      .day .day-number { font-size: 13px; }
+      .day .day-type { font-size: 9px; }
+      .month-heading { align-items: flex-start; flex-direction: column; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -195,13 +238,54 @@
 </head>
 <body>
   <main class="card" aria-labelledby="result-title">
-    <p class="eyebrow">大小周 · 本周日历</p>
+    <p class="eyebrow">大小周 · 月历视图</p>
     <h1 id="result-title">大周</h1>
-    <p class="subtitle">10 月 7 日，星期三</p>
+    <p class="subtitle">10 月 7 日，星期三 · 本周为大周</p>
 
-    <section class="week-dates" aria-label="本周日期范围">
-      <span class="icon" aria-hidden="true">▦</span>
-      <span>10 月 5 日 — 10 月 11 日<small>本周 · 周一至周日</small></span>
+    <section class="month-heading" aria-labelledby="month-title">
+      <div>
+        <h2 id="month-title">2026 年 10 月</h2>
+        <p>按周一至周日排列 · 每周轮换</p>
+      </div>
+      <div class="legend" aria-label="日历图例">
+        <span><i></i>休息日</span>
+      </div>
+    </section>
+
+    <section class="calendar" aria-label="2026年10月大小周日历">
+      <span class="weekday">一</span><span class="weekday">二</span><span class="weekday">三</span>
+      <span class="weekday">四</span><span class="weekday">五</span><span class="weekday">六</span><span class="weekday">日</span>
+      <span class="day empty" aria-hidden="true"></span><span class="day empty" aria-hidden="true"></span>
+      <span class="day empty" aria-hidden="true"></span><span class="day"><span class="day-number">1</span></span>
+      <span class="day"><span class="day-number">2</span></span><span class="day"><span class="day-number">3</span></span><span class="day rest"><span class="day-number">4</span><span class="day-type">休息</span></span>
+      <span class="day"><span class="day-number">5</span></span>
+      <span class="day"><span class="day-number">6</span></span>
+      <span class="day today" aria-current="date"><span class="day-number">7</span><span class="day-type">今天</span></span>
+      <span class="day"><span class="day-number">8</span></span>
+      <span class="day"><span class="day-number">9</span></span>
+      <span class="day rest"><span class="day-number">10</span><span class="day-type">休息</span></span>
+      <span class="day rest"><span class="day-number">11</span><span class="day-type">休息</span></span>
+      <span class="day"><span class="day-number">12</span></span>
+      <span class="day"><span class="day-number">13</span></span>
+      <span class="day"><span class="day-number">14</span></span>
+      <span class="day"><span class="day-number">15</span></span>
+      <span class="day"><span class="day-number">16</span></span>
+      <span class="day"><span class="day-number">17</span></span>
+      <span class="day rest"><span class="day-number">18</span><span class="day-type">休息</span></span>
+      <span class="day"><span class="day-number">19</span></span>
+      <span class="day"><span class="day-number">20</span></span>
+      <span class="day"><span class="day-number">21</span></span>
+      <span class="day"><span class="day-number">22</span></span>
+      <span class="day"><span class="day-number">23</span></span>
+      <span class="day rest"><span class="day-number">24</span><span class="day-type">休息</span></span>
+      <span class="day rest"><span class="day-number">25</span><span class="day-type">休息</span></span>
+      <span class="day"><span class="day-number">26</span></span>
+      <span class="day"><span class="day-number">27</span></span>
+      <span class="day"><span class="day-number">28</span></span>
+      <span class="day"><span class="day-number">29</span></span>
+      <span class="day"><span class="day-number">30</span></span>
+      <span class="day"><span class="day-number">31</span></span>
+      <span class="day empty" aria-hidden="true"></span>
     </section>
 
     <div class="divider" role="presentation"></div>
@@ -211,9 +295,9 @@
       <span class="arrow" aria-hidden="true">→</span>
       <div class="point"><strong>间隔 4 周</strong><span>偶数周，周期不变</span></div>
     </div>
-    <span class="tag">本周是大周</span>
+    <span class="tag">10 月 5 日 — 11 日 · 大周</span>
 
-    <footer>按每周轮换一次、周一至周日为一周计算</footer>
+    <footer>按大小周轮换：大周周六、周日休息，小周仅周日休息 · 今天以边框标示</footer>
   </main>
 </body>
 </html>
