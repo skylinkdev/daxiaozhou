@@ -114,7 +114,8 @@
     .month-heading .legend { display: flex; gap: 12px; color: var(--muted); font-size: 11px; }
     .legend span { display: inline-flex; align-items: center; gap: 5px; }
     .legend i { width: 7px; height: 7px; border-radius: 50%; background: #789073; }
-    .legend .small-dot { background: #d5a477; }
+    .legend .holiday-dot { background: #d5a477; }
+    .legend .makeup-dot { background: #a7a89f; }
 
     .calendar {
       display: grid;
@@ -150,6 +151,11 @@
     .day .day-type { font-size: 10px; }
     .day.rest { background: var(--green-soft); }
     .day.rest .day-type { color: var(--green); }
+    .day.holiday:not(.rest) { background: #f5eee6; }
+    .day.holiday .day-type { color: #9b704e; }
+    .day.makeup { background: #efeee8; }
+    .day.makeup .day-type { color: #777a70; }
+    .day.holiday.rest { background: linear-gradient(135deg, var(--green-soft) 50%, #f5eee6 50%); }
     .day.today { border-color: #748b6e; box-shadow: inset 0 0 0 1px #748b6e; }
     .day.today::after {
       position: absolute;
@@ -248,25 +254,24 @@
         <p>按周一至周日排列 · 每周轮换</p>
       </div>
       <div class="legend" aria-label="日历图例">
-        <span><i></i>休息日</span>
+        <span><i></i>大小周休息日</span>
+        <span><i class="holiday-dot"></i>法定假日</span>
+        <span><i class="makeup-dot"></i>调休补班</span>
       </div>
     </section>
 
-    <section class="calendar" aria-label="2026年10月大小周日历">
+    <section class="calendar" aria-label="2026年10月大小周日历" data-year="2026" data-month="10">
       <span class="weekday">一</span><span class="weekday">二</span><span class="weekday">三</span>
       <span class="weekday">四</span><span class="weekday">五</span><span class="weekday">六</span><span class="weekday">日</span>
       <span class="day empty" aria-hidden="true"></span><span class="day empty" aria-hidden="true"></span>
-      <span class="day empty" aria-hidden="true"></span><span class="day"><span class="day-number">1</span></span>
-      <span class="day"><span class="day-number">2</span></span><span class="day"><span class="day-number">3</span></span><span class="day rest"><span class="day-number">4</span><span class="day-type">休息</span></span>
-      <span class="day"><span class="day-number">5</span></span>
-      <span class="day"><span class="day-number">6</span></span>
-      <span class="day today" aria-current="date"><span class="day-number">7</span><span class="day-type">今天</span></span>
+      <span class="day empty" aria-hidden="true"></span>      <span class="day holiday"><span class="day-number">1</span><span class="day-type">国庆节</span></span>
+      <span class="day holiday"><span class="day-number">2</span><span class="day-type">国庆节</span></span><span class="day holiday"><span class="day-number">3</span><span class="day-type">国庆节</span></span><span class="day holiday rest"><span class="day-number">4</span><span class="day-type">国庆节</span></span>            <span class="day holiday"><span class="day-number">5</span><span class="day-type">国庆节</span></span>
+      <span class="day holiday"><span class="day-number">6</span><span class="day-type">国庆节</span></span>
+      <span class="day holiday today" aria-current="date"><span class="day-number">7</span><span class="day-type">国庆节 · 今天</span></span>
       <span class="day"><span class="day-number">8</span></span>
       <span class="day"><span class="day-number">9</span></span>
-      <span class="day rest"><span class="day-number">10</span><span class="day-type">休息</span></span>
-      <span class="day rest"><span class="day-number">11</span><span class="day-type">休息</span></span>
-      <span class="day"><span class="day-number">12</span></span>
-      <span class="day"><span class="day-number">13</span></span>
+      <span class="day makeup"><span class="day-number">10</span><span class="day-type">调休补班</span></span>
+      <span class="day rest"><span class="day-number">11</span><span class="day-type">休息</span></span>      <span class="day"><span class="day-number">12</span></span>      <span class="day"><span class="day-number">13</span></span>
       <span class="day"><span class="day-number">14</span></span>
       <span class="day"><span class="day-number">15</span></span>
       <span class="day"><span class="day-number">16</span></span>
@@ -297,7 +302,55 @@
     </div>
     <span class="tag">10 月 5 日 — 11 日 · 大周</span>
 
-    <footer>按大小周轮换：大周周六、周日休息，小周仅周日休息 · 今天以边框标示</footer>
+    <footer id="data-status" role="status" aria-live="polite">正在获取 2026 年法定节假日与调休安排…</footer>
   </main>
+  <script>
+    (() => {
+      const calendar = document.querySelector('.calendar');
+      const year = Number(calendar.dataset.year);
+      const month = Number(calendar.dataset.month);
+      const status = document.getElementById('data-status');
+      const dayCells = new Map(
+        [...calendar.querySelectorAll('.day-number')].map(number => [
+          Number(number.textContent), number.parentElement
+        ])
+      );
+
+      const markSpecialDays = entries => {
+        for (const [dateKey, detail] of Object.entries(entries)) {
+          const [entryYear, entryMonth, entryDay] = detail.date.split('-').map(Number);
+          if (entryYear !== year || entryMonth !== month) continue;
+          const cell = dayCells.get(entryDay);
+          if (!cell) continue;
+
+          const label = cell.querySelector('.day-type');
+          if (detail.holiday) {
+            cell.classList.add('holiday');
+            if (label) label.textContent = detail.name;
+            else cell.insertAdjacentHTML('beforeend', `<span class="day-type">${detail.name}</span>`);
+          } else if (detail.after) {
+            cell.classList.remove('rest');
+            cell.classList.add('makeup');
+            if (label) label.textContent = '调休补班';
+            else cell.insertAdjacentHTML('beforeend', '<span class="day-type">调休补班</span>');
+          }
+        }
+      };
+
+      fetch(`https://timor.tech/api/holiday/year/${year}`)
+        .then(response => {
+          if (!response.ok) throw new Error('holiday request failed');
+          return response.json();
+        })
+        .then(data => {
+          if (data.code !== 0 || !data.holiday) throw new Error('invalid holiday data');
+          markSpecialDays(data.holiday);
+          status.textContent = '已同步节假日与调休安排 · 假日橙色标记，调休补班日期另行标注';
+        })
+        .catch(() => {
+          status.textContent = '节假日数据暂不可用 · 当前显示大小周休息日，联网后可刷新重试';
+        });
+    })();
+  </script>
 </body>
 </html>
