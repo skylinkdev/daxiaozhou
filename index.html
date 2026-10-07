@@ -117,11 +117,35 @@
     .legend .holiday-dot { background: #d5a477; }
     .legend .makeup-dot { background: #a7a89f; }
 
+    .month-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 17px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fbfaf6;
+    }
+
+    .stat-label { color: var(--muted); font-size: 12px; }
+    .stat strong { font-size: 23px; font-weight: 650; letter-spacing: -.04em; }
+    .stat small { margin-left: 3px; color: var(--muted); font-size: 11px; font-weight: 400; }
+    .stat.rest-stat strong { color: var(--green); }
+    .stat.work-stat strong { color: var(--ink); }
+
     .calendar {
       display: grid;
       grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: 7px;
-      margin-top: 20px;
+      margin-top: 16px;
     }
 
     .weekday {
@@ -231,6 +255,9 @@
       .card { padding: 32px 22px 25px; border-radius: 20px; }
       .card::before { left: 22px; }
       .calendar { gap: 5px; }
+      .month-stats { gap: 8px; }
+      .stat { padding: 12px; }
+      .stat strong { font-size: 20px; }
       .day { min-height: 52px; border-radius: 9px; }
       .day .day-number { font-size: 13px; }
       .day .day-type { font-size: 9px; }
@@ -258,6 +285,11 @@
         <span><i class="holiday-dot"></i>法定假日</span>
         <span><i class="makeup-dot"></i>调休补班</span>
       </div>
+    </section>
+
+    <section class="month-stats" aria-label="本月工作休息统计">
+      <div class="stat rest-stat"><span class="stat-label">本月休息</span><strong><span id="rest-count">—</span><small>天</small></strong></div>
+      <div class="stat work-stat"><span class="stat-label">本月上班</span><strong><span id="work-count">—</span><small>天</small></strong></div>
     </section>
 
     <section class="calendar" aria-label="2026年10月大小周日历" data-year="2026" data-month="10">
@@ -315,6 +347,18 @@
           Number(number.textContent), number.parentElement
         ])
       );
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const restCount = document.getElementById('rest-count');
+      const workCount = document.getElementById('work-count');
+
+      const updateStats = () => {
+        let restDays = 0;
+        for (const cell of dayCells.values()) {
+          if (cell.classList.contains('rest') || cell.classList.contains('holiday')) restDays++;
+        }
+        restCount.textContent = restDays;
+        workCount.textContent = daysInMonth - restDays;
+      };
 
       const markSpecialDays = entries => {
         for (const [dateKey, detail] of Object.entries(entries)) {
@@ -345,11 +389,14 @@
         .then(data => {
           if (data.code !== 0 || !data.holiday) throw new Error('invalid holiday data');
           markSpecialDays(data.holiday);
-          status.textContent = '已同步节假日与调休安排 · 假日橙色标记，调休补班日期另行标注';
+          updateStats();
+          status.textContent = '已同步节假日与调休安排 · 休息日含大小周周末及法定假日';
         })
         .catch(() => {
-          status.textContent = '节假日数据暂不可用 · 当前显示大小周休息日，联网后可刷新重试';
+          status.textContent = '节假日数据暂不可用 · 统计基于大小周周末，联网后可刷新重试';
         });
+
+      updateStats();
     })();
   </script>
 </body>
