@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f5f1">
+  <title>这周是大周 · 大小周日历</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #242820;
+      --muted: #85887d;
+      --paper: #f6f5f1;
+      --card: #fffefa;
+      --line: #ecebe4;
+      --green: #425b45;
+      --green-soft: #e9eee6;
+      --orange: #e9a56e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 28px 18px;
+      background:
+        radial-gradient(ellipse at 15% 12%, rgba(232, 224, 204, .42), transparent 35%),
+        var(--paper);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .card {
+      position: relative;
+      width: min(100%, 480px);
+      overflow: hidden;
+      padding: 38px 38px 30px;
+      border: 1px solid rgba(226, 225, 216, .8);
+      border-radius: 24px;
+      background: var(--card);
+      box-shadow: 0 22px 70px rgba(54, 58, 45, .08), 0 2px 8px rgba(54, 58, 45, .03);
+      animation: rise .65s ease-out both;
+    }
+
+    .card::before {
+      position: absolute;
+      top: 0;
+      left: 38px;
+      width: 52px;
+      height: 4px;
+      border-radius: 0 0 5px 5px;
+      background: var(--orange);
+      content: "";
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .14em;
+    }
+
+    .eyebrow::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--orange);
+      content: "";
+    }
+
+    h1 {
+      margin: 32px 0 8px;
+      font-size: clamp(64px, 18vw, 88px);
+      font-weight: 650;
+      letter-spacing: -.075em;
+      line-height: .95;
+    }
+
+    .subtitle {
+      margin: 17px 0 0;
+      color: #74776d;
+      font-size: 15px;
+    }
+
+    .week-dates {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 34px;
+      padding: 17px 18px;
+      border-radius: 14px;
+      background: #f7f6f1;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .week-dates .icon {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .week-dates small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .divider { height: 1px; margin: 27px 0 22px; background: var(--line); }
+
+    .calculation-title {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .08em;
+    }
+
+    .calculation {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .point { min-width: 0; }
+    .point strong { display: block; font-size: 14px; font-weight: 600; }
+    .point span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
+
+    .arrow {
+      color: #b0b2a8;
+      font-size: 19px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 23px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .tag::before {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #6d8b6a;
+      content: "";
+    }
+
+    footer {
+      margin-top: 24px;
+      color: #a0a197;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 420px) {
+      .card { padding: 32px 25px 25px; border-radius: 20px; }
+      .card::before { left: 25px; }
+      .week-dates { padding: 15px; }
+      .calculation { gap: 7px; }
+      .point strong { font-size: 13px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card" aria-labelledby="result-title">
+    <p class="eyebrow">大小周 · 本周日历</p>
+    <h1 id="result-title">大周</h1>
+    <p class="subtitle">10 月 7 日，星期三</p>
+
+    <section class="week-dates" aria-label="本周日期范围">
+      <span class="icon" aria-hidden="true">▦</span>
+      <span>10 月 5 日 — 10 月 11 日<small>本周 · 周一至周日</small></span>
+    </section>
+
+    <div class="divider" role="presentation"></div>
+    <p class="calculation-title">判断依据</p>
+    <div class="calculation" aria-label="9月7日所在大周，间隔4周，本周仍是大周">
+      <div class="point"><strong>9 月 7 日 — 13 日</strong><span>已知：大周</span></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="point"><strong>间隔 4 周</strong><span>偶数周，周期不变</span></div>
+    </div>
+    <span class="tag">本周是大周</span>
+
+    <footer>按每周轮换一次、周一至周日为一周计算</footer>
+  </main>
+</body>
+</html>
